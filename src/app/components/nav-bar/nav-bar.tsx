@@ -5,7 +5,7 @@ import { MenuItem } from 'primereact/menuitem';
 import { InputText } from 'primereact/inputtext';
 import styles from './nav-bar.module.css';
 
-export default function NavBar(){
+export default function NavBar() {
 
     const items: MenuItem[] = [
         {
