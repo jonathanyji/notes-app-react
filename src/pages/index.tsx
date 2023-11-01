@@ -4,37 +4,27 @@ import { NotesService } from '@/app/service/Notes-Service';
 import { Button } from 'primereact/button';
 import { DataView } from 'primereact/dataview';
 import { Notes } from '@/app/service/Notes-Service';
-import { Menu } from 'primereact/menu';
+import { Dialog } from 'primereact/dialog';
 
 export default function Page() {
 
-    const menuRight = useRef(null);
-
-    const menuItems = [
-        {
-            items: [
-                {
-                    label: 'View',
-                    command:(e) => {
-                        console.log("VIEW BUTTON CLICKED: ", e)
-                        //router.push('/fileupload');
-                    }
-                },
-                {
-                    label: 'Update',
-                    command:(e) => {
-                        //router.push('/fileupload');
-                    }
-                }
-            ]
-        }
-    ];
-
+    const [visible, setVisible] = useState(false);
+    const [selectedNote, setSelectedNote] = useState<Notes | null>(null);
     const [notes, setNotes] = useState([]);
 
     useEffect(() => {
         NotesService.getNotes().then((data) => setNotes(data.slice(0,12)));
     }, []);
+
+    const showNoteDetails = (note: Notes) => {
+        console.log("THIS IS CALLED: ", note)
+        setSelectedNote(note);
+        setVisible(true);
+    };
+
+    const deleteNote = (note: Notes) => {
+        console.log("Delete: ", note)
+    }
 
     const gridItem = (notes: Notes) => {
         return (
@@ -45,8 +35,8 @@ export default function Page() {
                             <span className="font-semibold">{notes.title}</span>
                         </div>
                         <div>
-                            <Menu model={menuItems} popup ref={menuRight} id="popup_menu_right" popupAlignment="right" />
-                            <Button icon="pi pi-angle-down" rounded text className="mr-2" onClick={(event) => menuRight.current.toggle(event)} aria-controls="popup_menu_right" aria-haspopup />
+                            <Button icon="pi pi-angle-right" rounded text onClick={() => showNoteDetails(notes)}></Button>
+                            <Button icon="pi pi-delete-left" rounded text onClick={() => deleteNote(notes)}></Button>
                         </div>
                     </div>
                     <div className="flex flex-wrap align-items-center gap-2 py-5">
@@ -61,7 +51,22 @@ export default function Page() {
 
     return (
         <div className="card">
+            <div className="col-12 sm:col-6 lg:col-12 xl:col-4 p-2">
+                <div className="p-4 border-1 surface-border surface-card border-round flex justify-content-center">
+                    <Button icon="pi pi-plus" rounded text></Button>
+                </div>
+            </div>
             <DataView value={notes} itemTemplate={gridItem} layout="grid"/>
+            {selectedNote && (
+                <Dialog
+                    header={selectedNote.title}
+                    visible={visible}
+                    style={{ width: '50vw' }}
+                    onHide={() => setVisible(false)}
+                >
+                    <p className="m-0">{selectedNote.description}</p>
+                </Dialog>
+            )}
         </div>
     )
 }
