@@ -8,7 +8,7 @@ import { Dialog } from 'primereact/dialog';
 
 export default function Page() {
 
-    const [visible, setVisible] = useState(false);
+    const [notesDetailsVisible, setNotesDetailsVisible] = useState(false);
     const [selectedNote, setSelectedNote] = useState<Notes | null>(null);
     const [notes, setNotes] = useState([]);
 
@@ -19,7 +19,7 @@ export default function Page() {
     const showNoteDetails = (note: Notes) => {
         console.log("THIS IS CALLED: ", note)
         setSelectedNote(note);
-        setVisible(true);
+        setNotesDetailsVisible(true);
     };
 
     const deleteNote = (note: Notes) => {
@@ -60,9 +60,9 @@ export default function Page() {
             {selectedNote && (
                 <Dialog
                     header={selectedNote.title}
-                    visible={visible}
+                    visible={notesDetailsVisible}
                     style={{ width: '50vw' }}
-                    onHide={() => setVisible(false)}
+                    onHide={() => setNotesDetailsVisible(false)}
                 >
                     <p className="m-0">{selectedNote.description}</p>
                 </Dialog>
