@@ -1,3 +1,4 @@
+"use client"
 import 'primeflex/primeflex.css';
 import React, { useState, useEffect, useRef } from 'react';
 import { NotesService } from '@/app/service/Notes-Service';
@@ -6,8 +7,7 @@ import { DataView } from 'primereact/dataview';
 import { Notes } from '@/app/service/Notes-Service';
 import { Dialog } from 'primereact/dialog';
 
-export default function Page() {
-
+export default function Home() {
     const [notesDetailsVisible, setNotesDetailsVisible] = useState(false);
     const [selectedNote, setSelectedNote] = useState<Notes | null>(null);
     const [notes, setNotes] = useState([]);

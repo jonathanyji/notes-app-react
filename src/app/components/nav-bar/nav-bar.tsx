@@ -9,10 +9,12 @@ export default function NavBar() {
 
     const items: MenuItem[] = [
         {
-            label: 'Home'
+            label: 'Home',
+            url: '/'
         },
         {
-            label: 'About'
+            label: 'About',
+            url: '/about'
         }
     ];
 

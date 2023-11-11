@@ -1,4 +1,4 @@
-import NewNoteForm from "@/app/components/new-note-form/new-note-form";
+import NewNoteForm from "../components/new-note-form/new-note-form";
 
 export default function NewNotePage() {
     return (
