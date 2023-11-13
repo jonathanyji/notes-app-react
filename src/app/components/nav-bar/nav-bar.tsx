@@ -6,15 +6,22 @@ import { InputText } from 'primereact/inputtext';
 import styles from './nav-bar.module.css';
 import { Button } from 'primereact/button';
 import { useRouter } from 'next/navigation'
+import { useUser } from '@auth0/nextjs-auth0/client';
+
 
 export default function NavBar() {
 
     const router = useRouter()
+    const { user, isLoading } = useUser();
 
-    const items: MenuItem[] = [
+    const loggedInItems: MenuItem[] = [
         {
             label: 'Home',
             url: '/'
+        },
+        {
+            label: 'Create Note',
+            url: '/new-note'
         },
         {
             label: 'About',
@@ -22,12 +29,25 @@ export default function NavBar() {
         }
     ];
 
+    const loggoutItems: MenuItem[] = [
+        {
+            label: 'About',
+            url: '/about'
+        }
+    ];
+
     const start = <h5>Notes</h5>;
-    const end = <Button onClick={() => router.push('/new-note')} label="Create Note" severity="success" className="mr-3"></Button>;
+    const loginButton = <Button onClick={() => router.push('/api/auth/login')} label="Login" severity="success" className="mr-3"></Button>;
+    const logoutButton = <Button onClick={() => router.push('/api/auth/logout')} label="Logout" severity="success" className="mr-3"></Button>;
 
     return (
         <div className={styles.card}>
-            <Menubar model={items} start={start} end={end} />
+            {user && (
+                <Menubar model={loggedInItems} start={start} end={logoutButton} />
+            )}
+            {!user && (
+                <Menubar model={loggoutItems} start={start} end={loginButton} />
+            )}
         </div>
     )
 }
