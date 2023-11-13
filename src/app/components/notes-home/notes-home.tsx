@@ -1,76 +1,72 @@
 "use client"
 import 'primeflex/primeflex.css';
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import { NotesService } from '@/app/service/Notes-Service';
 import { Button } from 'primereact/button';
-import { DataView } from 'primereact/dataview';
 import { Notes } from '@/app/service/Notes-Service';
-import { Dialog } from 'primereact/dialog';
-// useRouter
-import { useRouter } from 'next/navigation'
+import { Column } from 'primereact/column';
+import { DataTable } from 'primereact/datatable';
+import  Router   from 'next/router'
 
 
 export default function NotesHome() {
-    const [notesDetailsVisible, setNotesDetailsVisible] = useState(false);
-    const [selectedNote, setSelectedNote] = useState<Notes | null>(null);
-    const [notes, setNotes] = useState([]);
-    const router = useRouter()
     
+    const [data, setData] = useState<Notes[]>([]);
+    const [isLoading, setLoading] = useState(true);
+
     useEffect(() => {
-        NotesService.getNotes().then((data) => setNotes(data.slice(0,12)));
-    }, []);
+        NotesService.getNotes().then(res => {
+            console.log("TEST DATA: ", res)
+            setData(res)
+            setLoading(false)
+        })
+    }, [])
 
-    const showNoteDetails = (note: Notes) => {
-        console.log("THIS IS CALLED: ", note)
-        setSelectedNote(note);
-        setNotesDetailsVisible(true);
-    };
+    if (isLoading) return <p>Loading...</p>
+    if (data.length === 0) return <p>No profile data</p>;
 
-    const deleteNote = (note: Notes) => {
-        console.log("Delete: ", note)
+    const actionButtonTemplate = (rowData: Notes) => {
+        return (
+            <div className="col-12">
+                <Button onClick={() => viewNote(rowData)} label="View" severity="success" className="mr-3"></Button>
+                <Button onClick={() => editNote(rowData)} label="Edit" className="mr-3"></Button>
+                <Button onClick={() => deleteNote(rowData)} label="Delete" severity="danger"></Button>
+            </div>
+        )
     }
 
-    const gridItem = (notes: Notes) => {
-        return (
-            <div className="col-12 sm:col-6 lg:col-12 xl:col-4 p-2">
-                <div className="p-4 border-1 surface-border surface-card border-round">
-                    <div className="flex flex-wrap align-items-center justify-content-between gap-2">
-                        <div className="flex align-items-center gap-2">
-                            <span className="font-semibold">{notes.title}</span>
-                        </div>
-                        <div>
-                            <Button icon="pi pi-angle-right" rounded text onClick={() => showNoteDetails(notes)}></Button>
-                            <Button icon="pi pi-delete-left" rounded text onClick={() => deleteNote(notes)}></Button>
-                        </div>
-                    </div>
-                    <div className="flex flex-wrap align-items-center gap-2 py-5">
-                        <div className="flex align-items-center gap-2">
-                            <span className="font-light">{ notes.description }</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        );
-    };
+    const viewNote = (selectedNote: Notes) => {
+        Router.push({
+            pathname: '/view-note',
+            query: {
+                id: selectedNote.id,
+                title: selectedNote.title,
+                description: selectedNote.description
+            }
+
+        });
+        console.log("View: ", selectedNote)
+    }
+
+    const editNote = (selectedNote: Notes) => {
+        console.log("Edit: ", selectedNote)
+    }
+
+    const deleteNote = (selectedNote: Notes) => {
+        console.log("Delete: ", selectedNote)
+    }
 
     return (
-        <div className="card">
-            <div className="col-12 sm:col-6 lg:col-12 xl:col-4 p-2" style={{cursor: 'grab'}} onClick={() => router.push('/new-note')}>
-                <div className="p-4 border-1 surface-border surface-card border-round flex justify-content-center">
-                    <Button icon="pi pi-plus" rounded text></Button>
-                </div>
+        <div>
+
+            <div className="card pl-6 pr-6 mt-6">
+                <DataTable value={data} paginator rows={5} rowsPerPageOptions={[5, 10, 25, 50]} tableStyle={{ minWidth: '50rem' }}>
+                    <Column field="title" header="Title" style={{ width: '25%' }}></Column>
+                    <Column field="description" header="Description" style={{ width: '25%' }}></Column>
+                    <Column header="Actions" body={actionButtonTemplate} style={{ width: '25%' }}></Column>
+                </DataTable>
             </div>
-            <DataView value={notes} itemTemplate={gridItem} layout="grid"/>
-            {selectedNote && (
-                <Dialog
-                    header={selectedNote.title}
-                    visible={notesDetailsVisible}
-                    style={{ width: '50vw' }}
-                    onHide={() => setNotesDetailsVisible(false)}
-                >
-                    <p className="m-0">{selectedNote.description}</p>
-                </Dialog>
-            )}
+
         </div>
     )
 }

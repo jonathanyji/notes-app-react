@@ -9,6 +9,8 @@ import 'primeicons/primeicons.css';
 import NavBar from './components/nav-bar/nav-bar';
 // END Prime React
 
+import { UserProvider } from '@auth0/nextjs-auth0/client';
+
 const inter = Inter({ subsets: ['latin'] })
 
 export const metadata: Metadata = {
@@ -24,10 +26,12 @@ export default function RootLayout({
   return (
     <PrimeReactProvider>
       <html lang="en">
+        <UserProvider>
         <body className={inter.className}>
           <NavBar></NavBar>
           {children}
         </body>
+        </UserProvider>
       </html>
     </PrimeReactProvider>
   )
