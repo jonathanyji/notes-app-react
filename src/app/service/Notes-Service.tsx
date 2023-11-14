@@ -1,3 +1,6 @@
+import { UserProfile } from "@auth0/nextjs-auth0/client";
+import { MeService } from "./Me-Service";
+
 export const NotesService = {
     getNotesData(): Notes[] {
         return [
@@ -56,7 +59,28 @@ export const NotesService = {
 
     getNotes(): Promise<Notes[]> {
         return Promise.resolve(this.getNotesData());
-      },
+    },
+
+    async getAllNotes(user: any) {
+        return MeService.getResponseHeader(user).then(async token => {
+            try {
+                const res = await fetch('https://localhost:7096/list', {
+                    headers: {
+                        'Authorization': `Bearer ${token.access_token}`,
+                        'Content-Type': 'application/json' // Adjust content type if necessary
+                    }
+                });
+                if (!res.ok) {
+                    throw new Error(`HTTP error! Status: '${res.status}'`)
+                }
+                const data = await res.json();
+                return data.value;
+            }
+            catch (err) {
+                return Promise.reject(err)
+            }
+        })
+    },
 }
 
 export interface Notes {

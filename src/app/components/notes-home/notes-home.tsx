@@ -7,20 +7,25 @@ import { Notes } from '@/app/service/Notes-Service';
 import { Column } from 'primereact/column';
 import { DataTable } from 'primereact/datatable';
 import  Router   from 'next/router'
+import { useUser } from '@auth0/nextjs-auth0/client';
+import { MeService } from '@/app/service/Me-Service';
 
 
 export default function NotesHome() {
     
+    const { user } = useUser();
     const [data, setData] = useState<Notes[]>([]);
     const [isLoading, setLoading] = useState(true);
 
     useEffect(() => {
-        NotesService.getNotes().then(res => {
-            console.log("TEST DATA: ", res)
+        //NotesService.getAllNotes()
+        NotesService.getAllNotes(user).then(res => {
             setData(res)
             setLoading(false)
+        }).catch(err => {
+            //console.log("Something went wrong!", err);
         })
-    }, [])
+    }, [user])
 
     if (isLoading) return <p>Loading...</p>
     if (data.length === 0) return <p>No profile data</p>;
@@ -58,6 +63,7 @@ export default function NotesHome() {
 
     return (
         <div>
+            
 
             <div className="card pl-6 pr-6 mt-6">
                 <DataTable value={data} paginator rows={5} rowsPerPageOptions={[5, 10, 25, 50]} tableStyle={{ minWidth: '50rem' }}>
