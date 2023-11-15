@@ -57,7 +57,7 @@ export const NotesService = {
     },
 
     getNotes(): Promise<Notes[]> {
-        return Promise.resolve(this.getNotesData());
+        return Promise.resolve(this.getNotesDummyData());
     },
 
     async getAllNotes(user: any) {
