@@ -8,7 +8,6 @@ import { Column } from 'primereact/column';
 import { DataTable } from 'primereact/datatable';
 import  Router   from 'next/router'
 import { useUser } from '@auth0/nextjs-auth0/client';
-import { MeService } from '@/app/service/Me-Service';
 
 
 export default function NotesHome() {
@@ -18,17 +17,13 @@ export default function NotesHome() {
     const [isLoading, setLoading] = useState(true);
 
     useEffect(() => {
-        //NotesService.getAllNotes()
-        NotesService.getAllNotes(user).then(res => {
-            setData(res)
-            setLoading(false)
-        }).catch(err => {
-            //console.log("Something went wrong!", err);
-        })
+        if (user){
+            NotesService.getAllNotes(user).then(res => {
+                setData(res)
+                setLoading(false)
+            })
+        }
     }, [user])
-
-    if (isLoading) return <p>Loading...</p>
-    if (data.length === 0) return <p>No profile data</p>;
 
     const actionButtonTemplate = (rowData: Notes) => {
         return (
@@ -63,8 +58,7 @@ export default function NotesHome() {
 
     return (
         <div>
-            
-
+            { isLoading ? <p>Loading......</p> : (data.length === 0) ? <p>No Notes data</p> :
             <div className="card pl-6 pr-6 mt-6">
                 <DataTable value={data} paginator rows={5} rowsPerPageOptions={[5, 10, 25, 50]} tableStyle={{ minWidth: '50rem' }}>
                     <Column field="title" header="Title" style={{ width: '25%' }}></Column>
@@ -72,7 +66,7 @@ export default function NotesHome() {
                     <Column header="Actions" body={actionButtonTemplate} style={{ width: '25%' }}></Column>
                 </DataTable>
             </div>
-
+             }
         </div>
     )
 }

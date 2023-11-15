@@ -1,5 +1,4 @@
-import { UserProfile } from "@auth0/nextjs-auth0/client";
-import { MeService } from "./Me-Service";
+import { MeService, TokenResponseHeader } from "./Me-Service";
 
 export const NotesService = {
     getNotesData(): Notes[] {
@@ -62,26 +61,33 @@ export const NotesService = {
     },
 
     async getAllNotes(user: any) {
-        return MeService.getResponseHeader(user).then(async token => {
-            try {
-                const res = await fetch('https://localhost:7096/list', {
-                    headers: {
-                        'Authorization': `Bearer ${token.access_token}`,
-                        'Content-Type': 'application/json' // Adjust content type if necessary
-                    }
-                });
-                if (!res.ok) {
-                    throw new Error(`HTTP error! Status: '${res.status}'`)
-                }
-                const data = await res.json();
-                return data.value;
-            }
-            catch (err) {
-                return Promise.reject(err)
-            }
+        return MeService.getTokenResponseHeader(user).then(async token => {
+            return this.listNotesApi(token);
         })
     },
+
+
+    async listNotesApi(token: TokenResponseHeader): Promise<Notes[]>  {
+        try {
+            const res = await fetch('https://localhost:7096/list', {
+                headers: {
+                    'Authorization': `Bearer ${token.access_token}`,
+                    'Content-Type': 'application/json' // Adjust content type if necessary
+                }
+            });
+            if (!res.ok) {
+                throw new Error(`HTTP error! Status: '${res.status}'`)
+            }
+            const data = await res.json();
+            return Promise.resolve(data.value);
+        }
+        catch (err) {
+            return Promise.reject(err)
+        }
+    }
+
 }
+
 
 export interface Notes {
     id: number;
