@@ -14,12 +14,16 @@ export const NotesApiService = {
             });
     },
 
+    _handleRequestError(result: any){
+        if (!result.ok) {
+            throw new Error(`HTTP error! Status: '${result.status}'`)
+        }
+    },
+
     async listNotesApi(token: TokenResponseHeader): Promise<Notes[]>  {
         try {
             const res = await this._handleHttpCall('GET', token, 'list')
-            if (!res.ok) {
-                throw new Error(`HTTP error! Status: '${res.status}'`)
-            }
+            this._handleRequestError(res);
             const data = await res.json();
             return Promise.resolve(data.value);
         }
@@ -32,9 +36,7 @@ export const NotesApiService = {
         console.log("Calling NOTES API")
         try {
             const res = await this._handleHttpCall('POST', token, 'create', request)
-            if (!res.ok) {
-                throw new Error(`HTTP error! Status: '${res.status}'`)
-            }
+            this._handleRequestError(res);
             return Promise.resolve();
         }
         catch (err) {
@@ -46,9 +48,7 @@ export const NotesApiService = {
         console.log("Calling DELETE NOTES API")
         try {
             const res = await this._handleHttpCall('DELETE', token, 'delete' + '?id=' + id)
-            if (!res.ok) {
-                throw new Error(`HTTP error! Status: '${res.status}'`)
-            }
+            this._handleRequestError(res);
             return Promise.resolve();
         }
         catch (err) {
