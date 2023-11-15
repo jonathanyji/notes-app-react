@@ -1,6 +1,6 @@
 "use client"
 import 'primeflex/primeflex.css';
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { NotesService } from '@/app/service/Notes-Service';
 import { Button } from 'primereact/button';
 import { Notes } from '@/app/service/Notes-Service';
@@ -8,10 +8,12 @@ import { Column } from 'primereact/column';
 import { DataTable } from 'primereact/datatable';
 import  Router   from 'next/router'
 import { useUser } from '@auth0/nextjs-auth0/client';
+import { Toast } from 'primereact/toast';
 
 
 export default function NotesHome() {
     
+    const toast = useRef<Toast>(null);
     const { user } = useUser();
     const [data, setData] = useState<Notes[]>([]);
     const [isLoading, setLoading] = useState(true);
@@ -54,20 +56,25 @@ export default function NotesHome() {
 
     const deleteNote = (selectedNote: Notes) => {
         console.log("Delete: ", selectedNote)
-        NotesService.deleteNewNoteById(selectedNote.id, user).then()
+        NotesService.deleteNewNoteById(selectedNote.id, user).then(() => {
+            setData(data.filter(item => item !== selectedNote))
+        }).then(() => {
+            toast.current?.show({ severity: 'success', detail: 'Deleted Successfully' });
+        })
     }
 
     return (
         <div>
             { isLoading ? <p>Loading......</p> : (data.length === 0) ? <p>No Notes data</p> :
             <div className="card pl-6 pr-6 mt-6">
-                <DataTable value={data} paginator rows={5} rowsPerPageOptions={[5, 10, 25, 50]} tableStyle={{ minWidth: '50rem' }}>
+                <DataTable value={data} paginator rows={10} rowsPerPageOptions={[5, 10, 25, 50]} tableStyle={{ minWidth: '50rem' }}>
                     <Column field="title" header="Title" style={{ width: '25%' }}></Column>
                     <Column field="description" header="Description" style={{ width: '25%' }}></Column>
                     <Column header="Actions" body={actionButtonTemplate} style={{ width: '25%' }}></Column>
                 </DataTable>
             </div>
              }
+             <Toast ref={toast} />
         </div>
     )
 }

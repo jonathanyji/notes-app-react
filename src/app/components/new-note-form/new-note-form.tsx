@@ -1,13 +1,19 @@
 "use client"
-import React, { useState } from 'react';
+import React, { useRef, useState } from 'react';
 import { InputText } from "primereact/inputtext";
 import { InputTextarea } from 'primereact/inputtextarea';
 import 'primeflex/primeflex.css';
 import { Notes, NotesService } from '@/app/service/Notes-Service';
 import { Button } from 'primereact/button';
 import { useUser } from '@auth0/nextjs-auth0/client';
+import { useRouter } from 'next/navigation'
+import { Toast } from 'primereact/toast';
+
 
 export default function NewNoteFrom() {
+
+    const router = useRouter()
+    const toast = useRef<Toast>(null);
 
     const { user } = useUser();
     const [titleInput, setTitleInput] = useState('');
@@ -25,8 +31,12 @@ export default function NewNoteFrom() {
             description: descInput
         }
         console.log("TEST SUBMIT: ", submitData)
+        
         NotesService.createNewNote(submitData, user).then(() => {
             resetForm();
+            toast.current?.show({ severity: 'success', detail: 'Note Created Successfully' });
+        }).then(() => {
+            router.push('/')
         })
     }
 
@@ -58,6 +68,7 @@ export default function NewNoteFrom() {
                 <Button onClick={handleSave} label="Save" disabled={titleInput === "" || descInput === ""} />
                 </div>
             </div>
+            <Toast ref={toast} />
         </div>
     )
 }
