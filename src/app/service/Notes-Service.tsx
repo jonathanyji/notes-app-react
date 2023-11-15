@@ -1,7 +1,7 @@
 import { MeService, TokenResponseHeader } from "./Me-Service";
 
 export const NotesService = {
-    getNotesData(): Notes[] {
+    getNotesDummyData(): Notes[] {
         return [
             {
                 id: 1,
