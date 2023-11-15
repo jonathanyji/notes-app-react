@@ -54,6 +54,7 @@ export default function NotesHome() {
 
     const deleteNote = (selectedNote: Notes) => {
         console.log("Delete: ", selectedNote)
+        NotesService.deleteNewNoteById(selectedNote.id, user).then()
     }
 
     return (

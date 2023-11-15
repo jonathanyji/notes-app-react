@@ -3,17 +3,31 @@ import React, { useState } from 'react';
 import { InputText } from "primereact/inputtext";
 import { InputTextarea } from 'primereact/inputtextarea';
 import 'primeflex/primeflex.css';
+import { Notes, NotesService } from '@/app/service/Notes-Service';
+import { Button } from 'primereact/button';
+import { useUser } from '@auth0/nextjs-auth0/client';
 
 export default function NewNoteFrom() {
+
+    const { user } = useUser();
     const [titleInput, setTitleInput] = useState('');
     const [descInput, setDescInput] = useState('');
+ 
+    const resetForm = () => {
+        setTitleInput("");
+        setDescInput("");
+    }
 
     const handleSave = () => {
-        let submitData = {
+        let submitData: Notes = {
+            id: "",
             title: titleInput,
             description: descInput
         }
         console.log("TEST SUBMIT: ", submitData)
+        NotesService.createNewNote(submitData, user).then(() => {
+            resetForm();
+        })
     }
 
     return (
@@ -41,7 +55,7 @@ export default function NewNoteFrom() {
             </div>
             <div className='row'>
                 <div className='col-12 flex justify-content-end'>
-                    <button onClick={handleSave} type="button" className="bg-primary border-primary-500 px-3 py-2 text-base border-1 border-solid border-round cursor-pointer transition-all transition-duration-200 hover:bg-primary-600 hover:border-primary-600 active:bg-primary-700 active:border-primary-700">Save</button>
+                <Button onClick={handleSave} label="Save" disabled={titleInput === "" || descInput === ""} />
                 </div>
             </div>
         </div>
